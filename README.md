@@ -1,59 +1,280 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PHP_Laravel12_Integrate_ChatGPT_API
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel">
+  <img src="https://img.shields.io/badge/OpenAI-API-blue?style=for-the-badge&logo=openai">
+  <img src="https://img.shields.io/badge/gpt-4o--mini-success?style=for-the-badge">
 </p>
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+##  Overview  
+This guide explains how to integrate **ChatGPT (OpenAI API)** into Laravel 12 using the official package:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```
+openai-php/laravel
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The user enters a topic → ChatGPT returns **5 domain name suggestions**.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+##  Features  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+###  AI Features  
+- Uses official **gpt-4o-mini** model  
+- High-quality, fast AI responses  
+- Any prompt, any use case  
+- Clean extraction using Laravel `Arr` helper  
 
-## Laravel Sponsors
+###  Technical Features  
+- Official Laravel SDK for OpenAI  
+- No manual curl  
+- API key stored in `.env`  
+- Fully MVC structured  
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+###  UI Features  
+- Bootstrap design  
+- Clean UX  
+- Instant result display  
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+##  Folder Structure  
 
-## Contributing
+```
+app/
+├── Http/
+│   └── Controllers/
+│       └── ChatGPTController.php
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+resources/
+└── views/
+    └── chatGPT.blade.php
 
-## Code of Conduct
+routes/
+└── web.php
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+config/
+└── openai.php
+```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+#  Step 1 — Install Laravel  
 
-## License
+```bash
+composer create-project laravel/laravel example-app
+cd example-app
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+#  Step 2 — Install OpenAI Laravel SDK  
+
+```bash
+composer require openai-php/laravel
+```
+
+Publish config:
+
+```bash
+php artisan vendor:publish --provider="OpenAI\Laravel\ServiceProvider"
+```
+
+This creates:
+
+```
+config/openai.php
+```
+
+---
+
+#  Step 3 — Setup OPENAI_API_KEY
+
+To connect Laravel with ChatGPT, you must add your API key.
+
+---
+
+### **1️⃣ Visit OpenAI Dashboard**
+
+🔗 https://platform.openai.com  
+
+Login with your account.
+
+---
+
+### **2️⃣ Create API Key**
+
+Go to:  
+🔗 https://platform.openai.com/account/api-keys  
+
+Click: **Create new secret key**
+
+<img width="1919" height="720" alt="1" src="https://github.com/user-attachments/assets/f0a7c1b2-11c4-44f1-9b72-6aa6dcf77a26" />
+
+Create  secret key:-
+
+> <img width="608" height="637" alt="Screenshot 2025-12-12 125148" src="https://github.com/user-attachments/assets/61795339-4faa-460e-8620-55d273f6f8ca" />
+
+
+Copy the generated key:-
+
+<img width="698" height="503" alt="Screenshot 2025-12-12 125206" src="https://github.com/user-attachments/assets/f66900f7-1ced-44d1-a45c-4b4f43df36c6" />
+
+---
+
+### **3️⃣ Add API Key to `.env`**
+
+```
+OPENAI_API_KEY=sk-your-api-key-here
+```
+
+###  Important Rules  
+- No quotes (  `OPENAI_API_KEY="sk-xxx"` )  
+- No extra space  
+- Correct format:  
+  ```
+  OPENAI_API_KEY=sk-123456789abcdef
+  ```
+
+---
+
+### **4️ Clear Configuration Cache**
+
+```
+php artisan config:clear
+php artisan cache:clear
+```
+
+---
+
+#  Step 4 — Create Route  
+
+ `routes/web.php`
+
+```php
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatGPTController;
+
+Route::get('/chat-gpt', [ChatGPTController::class, 'index'])
+     ->name('chat-gpt.index');
+```
+
+---
+
+#  Step 5 — Create Controller  
+
+ `app/Http/Controllers/ChatGPTController.php`
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use OpenAI\Laravel\Facades\OpenAI;
+
+class ChatGPTController extends Controller
+{
+    public function index(Request $request)
+    {
+        $result = '';
+
+        if ($request->filled('title')) {
+
+            $messages = [
+                [
+                    'role' => 'user',
+                    'content' => 'Suggest me 5 domain names based on topic "'
+                                 . $request->title .
+                                 '". Give clean list: 1. 2. 3. 4. 5.'
+                ],
+            ];
+
+            $response = OpenAI::chat()->create([
+                'model' => 'gpt-4o-mini',
+                'messages' => $messages,
+            ]);
+
+            $result = Arr::get($response, 'choices.0.message')['content'] ?? '';
+        }
+
+        return view('chatGPT', compact('result'));
+    }
+}
+```
+
+---
+
+#  Step 6 — Create Blade View  
+
+ `resources/views/chatGPT.blade.php`
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Laravel 12 - Integrate ChatGPT API Example</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card mt-5">
+
+        <h3 class="card-header p-3">Laravel 12 - ChatGPT Domain Name Generator</h3>
+
+        <div class="card-body">
+
+            <form method="GET" action="{{ route('chat-gpt.index') }}">
+                <div class="form-group">
+                    <label><strong>Enter Topic Title:</strong></label>
+                    <input type="text" name="title" class="form-control" placeholder="eg: travel, tech" required>
+                </div>
+
+                <button type="submit" class="btn btn-success mt-3">Submit</button>
+            </form>
+
+            @if(!empty($result))
+                <div class="mt-4">
+                    <strong>Generated Domain Names:</strong><br>
+                    {!! nl2br($result) !!}
+                </div>
+            @endif
+
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
+```
+
+---
+
+#  Step 7 — Run the Application  
+
+```bash
+php artisan serve
+```
+
+Open browser:
+
+```
+http://localhost:8000/chat-gpt
+```
+
+---
+
+#  Output Example  
+
+<img width="1630" height="539" alt="Screenshot 2025-12-12 133204" src="https://github.com/user-attachments/assets/1b4b6f7b-aad6-4867-a4ed-4e8bccd494ee" />
+
+
+<img width="1649" height="537" alt="Screenshot 2025-12-12 133238" src="https://github.com/user-attachments/assets/bdb83097-e7d4-4ef6-a10a-8c5f76f1ab1c" />
+

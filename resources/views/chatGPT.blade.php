@@ -5,14 +5,14 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Laravel 12 - AI Domain Name Generator</title>
 
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+        rel="stylesheet">
 
     <style>
 
@@ -31,6 +31,19 @@
             color: white;
         }
 
+        .stat-card {
+            border: none;
+            border-radius: 12px;
+            background: white;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
         .domain-card {
             border: 1px solid #e5e7eb;
             border-radius: 10px;
@@ -45,6 +58,10 @@
 
         .history-card {
             border-left: 4px solid #0d6efd;
+        }
+
+        .search-card {
+            border-left: 4px solid #198754;
         }
 
         .domain-text {
@@ -62,6 +79,16 @@
             padding: 20px;
         }
 
+        .copy-btn {
+            min-width: 75px;
+        }
+
+        .empty-box {
+            padding: 25px;
+            text-align: center;
+            color: #6c757d;
+        }
+
     </style>
 
 </head>
@@ -72,12 +99,14 @@
 
     <div class="row justify-content-center">
 
-        <div class="col-lg-10">
+        <div class="col-lg-11">
 
-            {{-- Main Generator Card --}}
             <div class="card main-card shadow-sm">
 
-                {{-- Header --}}
+                {{-- ===================================================== --}}
+                {{-- HEADER --}}
+                {{-- ===================================================== --}}
+
                 <div class="card-header card-header-custom p-4">
 
                     <h3 class="mb-1">
@@ -92,12 +121,48 @@
 
                 <div class="card-body p-4">
 
-                    {{-- Success Messages --}}
+                    {{-- ===================================================== --}}
+                    {{-- SUCCESS / ERROR MESSAGES --}}
+                    {{-- ===================================================== --}}
+
+                    <div
+                        id="copySuccessAlert"
+                        class="alert alert-success alert-dismissible fade show d-none"
+                        role="alert">
+
+                        <strong id="copyAlertTitle">
+                            ✅ Success!
+                        </strong>
+
+                        <span id="copySuccessMessage"></span>
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            onclick="hideCopyAlert()">
+                        </button>
+
+                    </div>
+
 
                     @if(session('success'))
 
-                        <div class="alert alert-success">
+                        <div
+                            class="alert alert-success alert-dismissible fade show"
+                            role="alert">
+
+                            <strong>
+                                ✅ Success!
+                            </strong>
+
                             {{ session('success') }}
+
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert">
+                            </button>
+
                         </div>
 
                     @endif
@@ -105,8 +170,22 @@
 
                     @if(session('favorite_success'))
 
-                        <div class="alert alert-warning">
+                        <div
+                            class="alert alert-warning alert-dismissible fade show"
+                            role="alert">
+
+                            <strong>
+                                ⭐ Favorite!
+                            </strong>
+
                             {{ session('favorite_success') }}
+
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert">
+                            </button>
+
                         </div>
 
                     @endif
@@ -114,18 +193,36 @@
 
                     @if(session('history_success'))
 
-                        <div class="alert alert-info">
+                        <div
+                            class="alert alert-info alert-dismissible fade show"
+                            role="alert">
+
+                            <strong>
+                                📜 History!
+                            </strong>
+
                             {{ session('history_success') }}
+
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert">
+                            </button>
+
                         </div>
 
                     @endif
 
 
-                    {{-- Validation Errors --}}
-
                     @if($errors->any())
 
-                        <div class="alert alert-danger">
+                        <div
+                            class="alert alert-danger alert-dismissible fade show"
+                            role="alert">
+
+                            <strong>
+                                ❌ Error!
+                            </strong>
 
                             <ul class="mb-0">
 
@@ -139,21 +236,85 @@
 
                             </ul>
 
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert">
+                            </button>
+
                         </div>
 
                     @endif
 
 
                     {{-- ===================================================== --}}
-                    {{-- Generator Form --}}
+                    {{-- STATISTICS --}}
+                    {{-- ===================================================== --}}
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-md-4">
+
+                            <div class="stat-card shadow-sm">
+
+                                <div class="text-muted">
+                                    🤖 Total Generations
+                                </div>
+
+                                <div class="stat-number">
+                                    {{ $totalGenerations }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <div class="stat-card shadow-sm">
+
+                                <div class="text-muted">
+                                    ⭐ Favorite Domains
+                                </div>
+
+                                <div class="stat-number">
+                                    {{ $totalFavorites }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <div class="stat-card shadow-sm">
+
+                                <div class="text-muted">
+                                    🌐 Domains Generated
+                                </div>
+
+                                <div class="stat-number">
+                                    {{ $totalDomainsGenerated }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- ===================================================== --}}
+                    {{-- GENERATOR FORM --}}
                     {{-- ===================================================== --}}
 
                     <form
                         method="GET"
-                        action="{{ route('chat-gpt.index') }}"
-                    >
+                        action="{{ route('chat-gpt.index') }}">
 
-                        {{-- AI Provider --}}
+                        {{-- Provider --}}
 
                         <div class="mb-3">
 
@@ -163,21 +324,22 @@
 
                             <select
                                 name="provider"
-                                class="form-select form-select-lg"
-                            >
+                                class="form-select form-select-lg">
 
                                 <option
                                     value="openai"
-                                    {{ $provider === 'openai' ? 'selected' : '' }}
-                                >
+                                    {{ $provider == 'openai' ? 'selected' : '' }}>
+
                                     🤖 OpenAI
+
                                 </option>
 
                                 <option
                                     value="gemini"
-                                    {{ $provider === 'gemini' ? 'selected' : '' }}
-                                >
+                                    {{ $provider == 'gemini' ? 'selected' : '' }}>
+
                                     ✨ Gemini
+
                                 </option>
 
                             </select>
@@ -199,34 +361,30 @@
                                 value="{{ $topic }}"
                                 class="form-control form-control-lg"
                                 placeholder="Example: technology, travel, fitness"
-                                required
-                            >
+                                required>
 
                         </div>
 
 
-                        {{-- Explicit generation flag --}}
                         <input
                             type="hidden"
                             name="generate"
-                            value="1"
-                        >
+                            value="1">
 
-
-                        {{-- Generate Button --}}
 
                         <button
                             type="submit"
-                            class="btn btn-success btn-lg"
-                        >
+                            class="btn btn-success btn-lg">
+
                             ✨ Generate Domains
+
                         </button>
 
                     </form>
 
 
                     {{-- ===================================================== --}}
-                    {{-- Generated Result --}}
+                    {{-- GENERATED RESULT --}}
                     {{-- ===================================================== --}}
 
                     @if(!empty($result))
@@ -234,39 +392,37 @@
                         <hr class="my-4">
 
 
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div
+                            class="d-flex justify-content-between align-items-center mb-3">
 
                             <h4 class="section-title mb-0">
                                 🌐 Generated Domain Names
                             </h4>
 
 
-                            {{-- Regenerate --}}
-
                             <form
                                 method="POST"
-                                action="{{ route('chat-gpt.regenerate') }}"
-                            >
+                                action="{{ route('chat-gpt.regenerate') }}">
 
                                 @csrf
 
                                 <input
                                     type="hidden"
                                     name="title"
-                                    value="{{ $topic }}"
-                                >
+                                    value="{{ $topic }}">
 
                                 <input
                                     type="hidden"
                                     name="provider"
-                                    value="{{ $provider }}"
-                                >
+                                    value="{{ $provider }}">
+
 
                                 <button
                                     type="submit"
-                                    class="btn btn-primary"
-                                >
+                                    class="btn btn-primary">
+
                                     🔄 Regenerate
+
                                 </button>
 
                             </form>
@@ -274,7 +430,19 @@
                         </div>
 
 
-                        {{-- Result Box --}}
+                        {{-- Search current generated domains --}}
+
+                        <div class="mb-3">
+
+                            <input
+                                type="text"
+                                id="domainSearch"
+                                class="form-control"
+                                placeholder="🔎 Search generated domains..."
+                                onkeyup="searchDomains()">
+
+                        </div>
+
 
                         <div class="result-box">
 
@@ -294,7 +462,7 @@
 
                                     $cleanDomain = trim(
                                         preg_replace(
-                                            '/^\s*\*?\s*\d+[\.\)\-\:]\s*/',
+                                            '/^\s*\**\s*\d+[\.\)\-\:]\s*\**/',
                                             '',
                                             $domain
                                         )
@@ -305,13 +473,13 @@
 
                                 @if(!empty($cleanDomain))
 
-                                    <div class="domain-card">
+                                    <div
+                                        class="domain-card generated-domain"
+                                        data-domain="{{ strtolower($cleanDomain) }}">
 
                                         <div class="row align-items-center">
 
-                                            {{-- Domain Name --}}
-
-                                            <div class="col-md-8">
+                                            <div class="col-md-7">
 
                                                 <span class="domain-text">
                                                     {{ $cleanDomain }}
@@ -320,47 +488,52 @@
                                             </div>
 
 
-                                            {{-- Favorite Button --}}
+                                            <div
+                                                class="col-md-5 text-md-end mt-2 mt-md-0">
 
-                                            <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                                                {{-- COPY --}}
+
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-outline-secondary btn-sm copy-btn"
+                                                    onclick="copyDomain(@js($cleanDomain), this)">
+
+                                                    📋 Copy
+
+                                                </button>
+
+
+                                                {{-- FAVORITE --}}
 
                                                 <form
                                                     method="POST"
                                                     action="{{ route('chat-gpt.favorite') }}"
-                                                    class="d-inline"
-                                                >
+                                                    class="d-inline">
 
                                                     @csrf
-
 
                                                     <input
                                                         type="hidden"
                                                         name="topic"
-                                                        value="{{ $topic }}"
-                                                    >
-
+                                                        value="{{ $topic }}">
 
                                                     <input
                                                         type="hidden"
                                                         name="domain"
-                                                        value="{{ $cleanDomain }}"
-                                                    >
-
-
-                                                    {{-- Preserve selected provider --}}
+                                                        value="{{ $cleanDomain }}">
 
                                                     <input
                                                         type="hidden"
                                                         name="provider"
-                                                        value="{{ $provider }}"
-                                                    >
+                                                        value="{{ $provider }}">
 
 
                                                     <button
                                                         type="submit"
-                                                        class="btn btn-outline-warning btn-sm"
-                                                    >
+                                                        class="btn btn-outline-warning btn-sm">
+
                                                         ⭐ Favorite
+
                                                     </button>
 
                                                 </form>
@@ -381,7 +554,130 @@
 
 
                     {{-- ===================================================== --}}
-                    {{-- Favorite Domains --}}
+                    {{-- SEARCH ALL GENERATED DOMAINS --}}
+                    {{-- ===================================================== --}}
+
+                    <hr class="my-5">
+
+
+                    <h4 class="section-title mb-3">
+                        🔎 Search All Generated Domains
+                    </h4>
+
+
+                    <form
+                        method="GET"
+                        action="{{ route('chat-gpt.index') }}"
+                        class="row g-2 mb-3">
+
+                        <div class="col-md-8">
+
+                            <input
+                                type="text"
+                                name="search"
+                                value="{{ $search }}"
+                                class="form-control"
+                                placeholder="Search domain name...">
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <button
+                                type="submit"
+                                class="btn btn-success">
+
+                                🔎 Search
+
+                            </button>
+
+
+                            <a
+                                href="{{ route('chat-gpt.index') }}"
+                                class="btn btn-secondary">
+
+                                Clear
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+
+                    @if($search !== '')
+
+                        <div class="result-box">
+
+                            @if(count($searchResults) > 0)
+
+                                <div class="mb-3">
+
+                                    <strong>
+                                        {{ count($searchResults) }}
+                                    </strong>
+
+                                    matching domain(s) found.
+
+                                </div>
+
+
+                                @foreach($searchResults as $item)
+
+                                    <div class="domain-card search-card">
+
+                                        <div
+                                            class="d-flex justify-content-between align-items-center">
+
+                                            <div>
+
+                                                <div class="domain-text">
+                                                    {{ $item['domain'] }}
+                                                </div>
+
+                                                <small class="text-muted">
+
+                                                    Topic:
+                                                    {{ $item['topic'] }}
+
+                                                </small>
+
+                                            </div>
+
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                onclick="copyDomain(@js($item['domain']), this)">
+
+                                                📋 Copy
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                @endforeach
+
+                            @else
+
+                                <div class="empty-box">
+
+                                    No matching domains found.
+
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                    @endif
+
+
+                    {{-- ===================================================== --}}
+                    {{-- FAVORITES --}}
                     {{-- ===================================================== --}}
 
                     @if($favorites->count() > 0)
@@ -389,9 +685,35 @@
                         <hr class="my-5">
 
 
-                        <h4 class="section-title mb-3">
-                            ⭐ Favorite Domains
-                        </h4>
+                        <div
+                            class="d-flex justify-content-between align-items-center mb-3">
+
+                            <h4 class="section-title mb-0">
+                                ⭐ Favorite Domains
+                            </h4>
+
+
+                            <form
+                                method="POST"
+                                action="{{ route('chat-gpt.favorites.clear') }}"
+                                onsubmit="return confirm('Delete all favorite domains?')">
+
+                                @csrf
+
+                                @method('DELETE')
+
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-danger btn-sm">
+
+                                    🗑️ Clear All
+
+                                </button>
+
+                            </form>
+
+                        </div>
 
 
                         <div class="row">
@@ -402,7 +724,8 @@
 
                                     <div class="domain-card favorite-card">
 
-                                        <div class="d-flex justify-content-between align-items-center">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center">
 
                                             <div>
 
@@ -411,32 +734,52 @@
                                                 </div>
 
                                                 <small class="text-muted">
-                                                    Topic: {{ $favorite->topic }}
+
+                                                    Topic:
+                                                    {{ $favorite->topic }}
+
                                                 </small>
 
                                             </div>
 
 
-                                            {{-- Delete Favorite --}}
+                                            <div>
 
-                                            <form
-                                                method="POST"
-                                                action="{{ route('chat-gpt.favorite.delete', $favorite->id) }}"
-                                            >
-
-                                                @csrf
-
-                                                @method('DELETE')
-
+                                                {{-- COPY --}}
 
                                                 <button
-                                                    type="submit"
-                                                    class="btn btn-outline-danger btn-sm"
-                                                >
-                                                    🗑️
+                                                    type="button"
+                                                    class="btn btn-outline-secondary btn-sm"
+                                                    onclick="copyDomain(@js($favorite->domain), this)">
+
+                                                    📋
+
                                                 </button>
 
-                                            </form>
+
+                                                {{-- DELETE --}}
+
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('chat-gpt.favorite.delete', $favorite->id) }}"
+                                                    class="d-inline">
+
+                                                    @csrf
+
+                                                    @method('DELETE')
+
+
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-outline-danger btn-sm">
+
+                                                        🗑️
+
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
 
                                         </div>
 
@@ -452,7 +795,7 @@
 
 
                     {{-- ===================================================== --}}
-                    {{-- Generation History --}}
+                    {{-- GENERATION HISTORY --}}
                     {{-- ===================================================== --}}
 
                     @if($history->count() > 0)
@@ -460,10 +803,106 @@
                         <hr class="my-5">
 
 
-                        <h4 class="section-title mb-3">
-                            📜 Generation History
-                        </h4>
+                        <div
+                            class="d-flex justify-content-between align-items-center mb-3">
 
+                            <h4 class="section-title mb-0">
+                                📜 Generation History
+                            </h4>
+
+
+                            <div>
+
+                                {{-- CSV --}}
+
+                                <a
+                                    href="{{ route('chat-gpt.history.export') }}"
+                                    class="btn btn-success btn-sm">
+
+                                    📥 Export CSV
+
+                                </a>
+
+
+                                {{-- CLEAR HISTORY --}}
+
+                                <form
+                                    method="POST"
+                                    action="{{ route('chat-gpt.history.clear') }}"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Delete all generation history?')">
+
+                                    @csrf
+
+                                    @method('DELETE')
+
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger btn-sm">
+
+                                        🗑️ Clear All
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- SORTING --}}
+
+                        <form
+                            method="GET"
+                            action="{{ route('chat-gpt.index') }}"
+                            class="mb-3">
+
+                            <input
+                                type="hidden"
+                                name="title"
+                                value="{{ $topic }}">
+
+                            <input
+                                type="hidden"
+                                name="provider"
+                                value="{{ $provider }}">
+
+
+                            <label class="form-label fw-bold">
+                                Sort History
+                            </label>
+
+
+                            <select
+                                name="sort"
+                                class="form-select"
+                                onchange="this.form.submit()">
+
+                                <option
+                                    value="newest"
+                                    {{ $sort == 'newest' ? 'selected' : '' }}>
+
+                                    Newest First
+
+                                </option>
+
+
+                                <option
+                                    value="oldest"
+                                    {{ $sort == 'oldest' ? 'selected' : '' }}>
+
+                                    Oldest First
+
+                                </option>
+
+                            </select>
+
+                        </form>
+
+
+                        {{-- HISTORY ITEMS --}}
 
                         @foreach($history as $item)
 
@@ -471,9 +910,8 @@
 
                                 <div class="card-body">
 
-                                    <div class="d-flex justify-content-between align-items-start">
-
-                                        {{-- History Information --}}
+                                    <div
+                                        class="d-flex justify-content-between align-items-start">
 
                                         <div>
 
@@ -481,19 +919,22 @@
                                                 {{ $item->topic }}
                                             </h5>
 
+
                                             <small class="text-muted">
+
                                                 {{ $item->created_at->format('d M Y, h:i A') }}
+
                                             </small>
 
                                         </div>
 
 
-                                        {{-- Delete History --}}
+                                        {{-- DELETE ONE HISTORY --}}
 
                                         <form
                                             method="POST"
                                             action="{{ route('chat-gpt.history.delete', $item->id) }}"
-                                        >
+                                            onsubmit="return confirm('Delete this history record?')">
 
                                             @csrf
 
@@ -502,9 +943,10 @@
 
                                             <button
                                                 type="submit"
-                                                class="btn btn-outline-danger btn-sm"
-                                            >
+                                                class="btn btn-outline-danger btn-sm">
+
                                                 🗑️ Delete
+
                                             </button>
 
                                         </form>
@@ -512,11 +954,63 @@
                                     </div>
 
 
-                                    {{-- Generated Result --}}
-
                                     <div class="mt-3">
 
-                                        {!! nl2br(e($item->result)) !!}
+                                        @php
+
+                                            $historyDomains = preg_split(
+                                                '/\r\n|\r|\n/',
+                                                trim($item->result)
+                                            );
+
+                                        @endphp
+
+
+                                        @foreach($historyDomains as $historyDomain)
+
+                                            @php
+
+                                                $cleanHistoryDomain = trim(
+                                                    preg_replace(
+                                                        '/^\s*\**\s*\d+[\.\)\-\:]\s*\**/',
+                                                        '',
+                                                        $historyDomain
+                                                    )
+                                                );
+
+                                            @endphp
+
+
+                                            @if(!empty($cleanHistoryDomain))
+
+                                                <div class="domain-card">
+
+                                                    <div
+                                                        class="d-flex justify-content-between align-items-center">
+
+                                                        <span class="domain-text">
+
+                                                            {{ $cleanHistoryDomain }}
+
+                                                        </span>
+
+
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-outline-secondary btn-sm"
+                                                            onclick="copyDomain(@js($cleanHistoryDomain), this)">
+
+                                                            📋 Copy
+
+                                                        </button>
+
+                                                    </div>
+
+                                                </div>
+
+                                            @endif
+
+                                        @endforeach
 
                                     </div>
 
@@ -538,6 +1032,243 @@
 
 </div>
 
+
+{{-- ========================================================= --}}
+{{-- JAVASCRIPT --}}
+{{-- ========================================================= --}}
+
+<script>
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search current generated domains
+    |--------------------------------------------------------------------------
+    */
+
+    function searchDomains() {
+
+        const input =
+            document.getElementById('domainSearch');
+
+        if (!input) {
+            return;
+        }
+
+        const search =
+            input.value.toLowerCase().trim();
+
+        const domains =
+            document.querySelectorAll('.generated-domain');
+
+        domains.forEach(function(domain) {
+
+            const text =
+                domain.getAttribute('data-domain') || '';
+
+            if (text.includes(search)) {
+
+                domain.style.display = '';
+
+            } else {
+
+                domain.style.display = 'none';
+
+            }
+
+        });
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Copy domain
+    |--------------------------------------------------------------------------
+    */
+
+    function copyDomain(domain, button) {
+
+        if (!navigator.clipboard) {
+
+            showCopyError(
+                'Clipboard is not supported by this browser.'
+            );
+
+            return;
+        }
+
+
+        navigator.clipboard
+            .writeText(domain)
+
+            .then(function() {
+
+                const oldText =
+                    button.innerHTML;
+
+                button.innerHTML =
+                    '✅ Copied';
+
+
+                showCopySuccess(
+                    'Domain "' +
+                    domain +
+                    '" copied successfully!'
+                );
+
+
+                setTimeout(function() {
+
+                    button.innerHTML =
+                        oldText;
+
+                }, 1500);
+
+            })
+
+            .catch(function() {
+
+                showCopyError(
+                    'Unable to copy domain.'
+                );
+
+            });
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Show copy success
+    |--------------------------------------------------------------------------
+    */
+
+    function showCopySuccess(message) {
+
+        const alert =
+            document.getElementById(
+                'copySuccessAlert'
+            );
+
+        const title =
+            document.getElementById(
+                'copyAlertTitle'
+            );
+
+        const messageElement =
+            document.getElementById(
+                'copySuccessMessage'
+            );
+
+
+        alert.classList.remove(
+            'd-none',
+            'alert-danger'
+        );
+
+        alert.classList.add(
+            'alert-success'
+        );
+
+
+        title.innerHTML =
+            '✅ Success!';
+
+
+        messageElement.innerText =
+            ' ' + message;
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+
+        setTimeout(function() {
+
+            hideCopyAlert();
+
+        }, 3000);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Show copy error
+    |--------------------------------------------------------------------------
+    */
+
+    function showCopyError(message) {
+
+        const alert =
+            document.getElementById(
+                'copySuccessAlert'
+            );
+
+        const title =
+            document.getElementById(
+                'copyAlertTitle'
+            );
+
+        const messageElement =
+            document.getElementById(
+                'copySuccessMessage'
+            );
+
+
+        alert.classList.remove(
+            'd-none',
+            'alert-success'
+        );
+
+        alert.classList.add(
+            'alert-danger'
+        );
+
+
+        title.innerHTML =
+            '❌ Error!';
+
+
+        messageElement.innerText =
+            ' ' + message;
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+
+        setTimeout(function() {
+
+            hideCopyAlert();
+
+        }, 3000);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hide copy alert
+    |--------------------------------------------------------------------------
+    */
+
+    function hideCopyAlert() {
+
+        const alert =
+            document.getElementById(
+                'copySuccessAlert'
+            );
+
+        alert.classList.add(
+            'd-none'
+        );
+
+    }
+
+</script>
+
 </body>
 
 </html>
+

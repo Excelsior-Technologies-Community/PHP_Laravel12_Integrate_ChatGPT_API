@@ -25,6 +25,12 @@ Route::delete('/chat-gpt/favorite/{id}', [ChatGPTController::class, 'removeFavor
 Route::delete('/chat-gpt/history/{id}', [ChatGPTController::class, 'deleteHistory'])
     ->name('chat-gpt.history.delete');
 
+Route::delete('/chat-gpt/history', [ChatGPTController::class, 'clearHistory'])
+    ->name('chat-gpt.history.clear');
+
+Route::delete('/chat-gpt/favorites', [ChatGPTController::class, 'clearFavorites'])
+    ->name('chat-gpt.favorites.clear');
+
 Route::get('/test-gemini', function () {
     $response = Http::withHeaders([
         'x-goog-api-key' => env('GEMINI_API_KEY'),

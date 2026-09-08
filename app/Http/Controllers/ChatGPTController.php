@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\FavoriteDomain;
 use App\Models\GenerationHistory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use OpenAI\Laravel\Facades\OpenAI;
 use Gemini\Laravel\Facades\Gemini;
 
@@ -37,13 +36,22 @@ class ChatGPTController extends Controller
             ]);
         }
 
-        $history = GenerationHistory::latest()->get();
-        $favorites = FavoriteDomain::latest()->get();
+        $search = $request->get('search', '');
+
+        $historyQuery = GenerationHistory::query();
+
+        if ($search !== '') {
+            $historyQuery->where('topic', 'like', '%' . $search . '%');
+        }
+
+        $history = $historyQuery->latest()->paginate(10, ['*'], 'history_page');
+        $favorites = FavoriteDomain::latest()->paginate(10, ['*'], 'favorites_page');
 
         return view('chatGPT', compact(
             'result',
             'topic',
             'provider',
+            'search',
             'history',
             'favorites'
         ));
@@ -74,6 +82,7 @@ class ChatGPTController extends Controller
                 'title' => $topic,
                 'provider' => $provider,
                 'generate' => '1',
+                'search' => request('search', ''),
             ])
             ->with('success', 'New domain names generated successfully!');
     }
@@ -98,6 +107,7 @@ class ChatGPTController extends Controller
             ->route('chat-gpt.index', [
                 'title' => $request->topic,
                 'provider' => $request->provider ?? 'openai',
+                'search' => request('search', ''),
             ])
             ->with('favorite_success', 'Domain saved to favorites!');
     }
@@ -125,6 +135,32 @@ class ChatGPTController extends Controller
         return back()->with(
             'history_success',
             'Generation history deleted!'
+        );
+    }
+
+    /**
+     * Clear all generation history.
+     */
+    public function clearHistory(Request $request)
+    {
+        GenerationHistory::query()->delete();
+
+        return back()->with(
+            'history_success',
+            'All generation history cleared!'
+        );
+    }
+
+    /**
+     * Clear all favorite domains.
+     */
+    public function clearFavorites(Request $request)
+    {
+        FavoriteDomain::query()->delete();
+
+        return back()->with(
+            'favorite_success',
+            'All favorites cleared!'
         );
     }
 
@@ -159,16 +195,25 @@ class ChatGPTController extends Controller
                 ],
             ];
 
-            $response = OpenAI::chat()->create([
-                'model' => 'gpt-4o-mini',
-                'messages' => $messages,
-            ]);
+            try {
 
-            return Arr::get(
-                $response->toArray(),
-                'choices.0.message.content',
-                ''
-            );
+                $response = OpenAI::chat()->create([
+                    'model' => 'gpt-4o-mini',
+                    'messages' => $messages,
+                ]);
+
+                $data = $response->toArray();
+
+                if (!isset($data['choices'][0]['message']['content'])) {
+                    return 'Error: Invalid response from OpenAI. Please try again.';
+                }
+
+                return $data['choices'][0]['message']['content'];
+
+            } catch (\Exception $e) {
+
+                return 'OpenAI Error: ' . $e->getMessage();
+            }
         }
 
         /*
@@ -178,11 +223,24 @@ class ChatGPTController extends Controller
         */
         if ($provider === 'gemini') {
 
-            $response = Gemini::generativeModel(
-                model: config('gemini.model', 'gemini-2.5-flash')
-            )->generateContent($prompt);
+            try {
 
-            return $response->text();
+                $response = Gemini::generativeModel(
+                    model: config('gemini.model', 'gemini-2.5-flash')
+                )->generateContent($prompt);
+
+                $text = $response->text();
+
+                if (empty($text)) {
+                    return 'Error: Empty response from Gemini. Please try again.';
+                }
+
+                return $text;
+
+            } catch (\Exception $e) {
+
+                return 'Gemini Error: ' . $e->getMessage();
+            }
         }
 
         return '';

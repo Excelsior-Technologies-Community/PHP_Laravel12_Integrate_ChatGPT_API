@@ -101,6 +101,12 @@ Route::get(
 |--------------------------------------------------------------------------
 */
 
+Route::delete('/chat-gpt/history', [ChatGPTController::class, 'clearHistory'])
+    ->name('chat-gpt.history.clear');
+
+Route::delete('/chat-gpt/favorites', [ChatGPTController::class, 'clearFavorites'])
+    ->name('chat-gpt.favorites.clear');
+
 Route::get('/test-gemini', function () {
 
     $response = Http::withHeaders([

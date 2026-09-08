@@ -80,6 +80,7 @@
         }
 
         .copy-btn {
+<<<<<<< HEAD
             min-width: 75px;
         }
 
@@ -87,6 +88,23 @@
             padding: 25px;
             text-align: center;
             color: #6c757d;
+=======
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 2px 6px;
+            font-size: 12px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
+        .search-box {
+            max-width: 400px;
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
         }
 
     </style>
@@ -479,11 +497,26 @@
 
                                         <div class="row align-items-center">
 
+<<<<<<< HEAD
                                             <div class="col-md-7">
+=======
+                                             {{-- Domain Name --}}
+
+                                            <div class="col-md-8">
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
 
                                                 <span class="domain-text">
                                                     {{ $cleanDomain }}
                                                 </span>
+
+                                                <button
+                                                    type="button"
+                                                    class="copy-btn"
+                                                    onclick="copyToClipboard('{{ $cleanDomain }}', this)"
+                                                    title="Copy to clipboard"
+                                                >
+                                                    📋
+                                                </button>
 
                                             </div>
 
@@ -684,14 +717,19 @@
 
                         <hr class="my-5">
 
+                        <div class="d-flex justify-content-between align-items-center mb-3">
 
+<<<<<<< HEAD
                         <div
                             class="d-flex justify-content-between align-items-center mb-3">
 
+=======
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
                             <h4 class="section-title mb-0">
                                 ⭐ Favorite Domains
                             </h4>
 
+<<<<<<< HEAD
 
                             <form
                                 method="POST"
@@ -709,6 +747,22 @@
 
                                     🗑️ Clear All
 
+=======
+                            <form
+                                method="POST"
+                                action="{{ route('chat-gpt.favorites.clear') }}"
+                                onsubmit="return confirm('Are you sure you want to clear all favorites?');"
+                            >
+
+                                @csrf
+                                @method('DELETE')
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-danger btn-sm"
+                                >
+                                    🗑️ Clear All
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
                                 </button>
 
                             </form>
@@ -789,6 +843,18 @@
 
                             @endforeach
 
+                            {{-- Favorites Pagination --}}
+
+                            @if($favorites->hasPages())
+
+                                <div class="mt-3">
+
+                                    {{ $favorites->appends(request()->except('favorites_page'))->links() }}
+
+                                </div>
+
+                            @endif
+
                         </div>
 
                     @endif
@@ -802,9 +868,94 @@
 
                         <hr class="my-5">
 
+                        <div class="d-flex justify-content-between align-items-center mb-3">
 
+<<<<<<< HEAD
                         <div
                             class="d-flex justify-content-between align-items-center mb-3">
+=======
+                            <h4 class="section-title mb-0">
+                                📜 Generation History
+                            </h4>
+
+                            <form
+                                method="POST"
+                                action="{{ route('chat-gpt.history.clear') }}"
+                                onsubmit="return confirm('Are you sure you want to clear all history?');"
+                            >
+
+                                @csrf
+                                @method('DELETE')
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-danger btn-sm"
+                                >
+                                    🗑️ Clear All
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                        {{-- Search History --}}
+
+                        <form
+                            method="GET"
+                            action="{{ route('chat-gpt.index') }}"
+                            class="mb-3 search-box"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="title"
+                                value="{{ $topic }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="provider"
+                                value="{{ $provider }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="generate"
+                                value="1"
+                            >
+
+                            <div class="input-group">
+
+                                <input
+                                    type="text"
+                                    name="search"
+                                    value="{{ $search }}"
+                                    class="form-control"
+                                    placeholder="Search history by topic..."
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-outline-primary"
+                                >
+                                    🔍 Search
+                                </button>
+
+                                @if($search !== '')
+
+                                    <a
+                                        href="{{ route('chat-gpt.index', ['title' => $topic, 'provider' => $provider, 'generate' => 1]) }}"
+                                        class="btn btn-outline-secondary"
+                                    >
+                                        ✕ Clear
+                                    </a>
+
+                                @endif
+
+                            </div>
+
+                        </form>
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
 
                             <h4 class="section-title mb-0">
                                 📜 Generation History
@@ -1020,6 +1171,18 @@
 
                         @endforeach
 
+                        {{-- History Pagination --}}
+
+                        @if($history->hasPages())
+
+                            <div class="mt-3">
+
+                                {{ $history->appends(request()->except('history_page'))->links() }}
+
+                            </div>
+
+                        @endif
+
                     @endif
 
                 </div>
@@ -1032,6 +1195,7 @@
 
 </div>
 
+<<<<<<< HEAD
 
 {{-- ========================================================= --}}
 {{-- JAVASCRIPT --}}
@@ -1267,6 +1431,30 @@
     }
 
 </script>
+=======
+    <script>
+
+        function copyToClipboard(text, button) {
+
+            navigator.clipboard.writeText(text).then(function() {
+
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.opacity = '1';
+
+                setTimeout(function() {
+                    button.innerHTML = originalHTML;
+                    button.style.opacity = '0.6';
+                }, 1500);
+
+            }).catch(function(err) {
+                console.error('Failed to copy: ', err);
+            });
+
+        }
+
+    </script>
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
 
 </body>
 

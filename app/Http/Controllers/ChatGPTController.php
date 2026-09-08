@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\FavoriteDomain;
 use App\Models\GenerationHistory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use OpenAI\Laravel\Facades\OpenAI;
 use Gemini\Laravel\Facades\Gemini;
 
@@ -58,12 +57,25 @@ class ChatGPTController extends Controller
             }
         }
 
+<<<<<<< HEAD
         /*
         |--------------------------------------------------------------------------
         | Favorites
         |--------------------------------------------------------------------------
         */
         $favorites = FavoriteDomain::latest()->get();
+=======
+        $search = $request->get('search', '');
+
+        $historyQuery = GenerationHistory::query();
+
+        if ($search !== '') {
+            $historyQuery->where('topic', 'like', '%' . $search . '%');
+        }
+
+        $history = $historyQuery->latest()->paginate(10, ['*'], 'history_page');
+        $favorites = FavoriteDomain::latest()->paginate(10, ['*'], 'favorites_page');
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
 
         /*
         |--------------------------------------------------------------------------
@@ -134,6 +146,7 @@ class ChatGPTController extends Controller
             'result',
             'topic',
             'provider',
+            'search',
             'history',
             'favorites',
             'search',
@@ -176,6 +189,7 @@ class ChatGPTController extends Controller
                 'title' => $topic,
                 'provider' => $provider,
                 'generate' => '1',
+                'search' => request('search', ''),
             ])
             ->with(
                 'success',
@@ -199,10 +213,20 @@ class ChatGPTController extends Controller
             'domain' => $request->domain,
         ]);
 
+<<<<<<< HEAD
         return back()->with(
             'favorite_success',
             'Domain saved to favorites successfully!'
         );
+=======
+        return redirect()
+            ->route('chat-gpt.index', [
+                'title' => $request->topic,
+                'provider' => $request->provider ?? 'openai',
+                'search' => request('search', ''),
+            ])
+            ->with('favorite_success', 'Domain saved to favorites!');
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
     }
 
     /**
@@ -247,17 +271,26 @@ class ChatGPTController extends Controller
     /**
      * Clear all generation history.
      */
+<<<<<<< HEAD
     public function clearHistory()
+=======
+    public function clearHistory(Request $request)
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
     {
         GenerationHistory::query()->delete();
 
         return back()->with(
             'history_success',
+<<<<<<< HEAD
             'All generation history has been deleted successfully!'
+=======
+            'All generation history cleared!'
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
         );
     }
 
     /**
+<<<<<<< HEAD
      * Export generation history as CSV.
      */
     public function exportHistory()
@@ -317,11 +350,26 @@ class ChatGPTController extends Controller
             $callback,
             200,
             $headers
+=======
+     * Clear all favorite domains.
+     */
+    public function clearFavorites(Request $request)
+    {
+        FavoriteDomain::query()->delete();
+
+        return back()->with(
+            'favorite_success',
+            'All favorites cleared!'
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
         );
     }
 
     /**
+<<<<<<< HEAD
      * Generate domain names using selected AI provider.
+=======
+     * Generate domain names using the selected AI provider.
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
      */
     private function generateDomains(
         string $topic,
@@ -353,16 +401,25 @@ class ChatGPTController extends Controller
                 ],
             ];
 
-            $response = OpenAI::chat()->create([
-                'model' => 'gpt-4o-mini',
-                'messages' => $messages,
-            ]);
+            try {
 
-            return Arr::get(
-                $response->toArray(),
-                'choices.0.message.content',
-                ''
-            );
+                $response = OpenAI::chat()->create([
+                    'model' => 'gpt-4o-mini',
+                    'messages' => $messages,
+                ]);
+
+                $data = $response->toArray();
+
+                if (!isset($data['choices'][0]['message']['content'])) {
+                    return 'Error: Invalid response from OpenAI. Please try again.';
+                }
+
+                return $data['choices'][0]['message']['content'];
+
+            } catch (\Exception $e) {
+
+                return 'OpenAI Error: ' . $e->getMessage();
+            }
         }
 
         /*
@@ -372,14 +429,33 @@ class ChatGPTController extends Controller
         */
         if ($provider === 'gemini') {
 
+<<<<<<< HEAD
             $response = Gemini::generativeModel(
                 model: config(
                     'gemini.model',
                     'gemini-2.5-flash'
                 )
             )->generateContent($prompt);
+=======
+            try {
+>>>>>>> 0b3e60cef0697046178ba7fd98fa8b4c9e69de3e
 
-            return $response->text();
+                $response = Gemini::generativeModel(
+                    model: config('gemini.model', 'gemini-2.5-flash')
+                )->generateContent($prompt);
+
+                $text = $response->text();
+
+                if (empty($text)) {
+                    return 'Error: Empty response from Gemini. Please try again.';
+                }
+
+                return $text;
+
+            } catch (\Exception $e) {
+
+                return 'Gemini Error: ' . $e->getMessage();
+            }
         }
 
         return '';
